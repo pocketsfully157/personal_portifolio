@@ -96,31 +96,57 @@
   }
 
   /* ---------- Contact form (front-end only demo) ---------- */
-  var form = document.getElementById('contact-form');
-  var status = document.getElementById('form-status');
+  const form = document.getElementById("contact-form");
+const status = document.getElementById("form-status");
 
-  if (form && status) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+if (form && status) {
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-      var name = form.name.value.trim();
-      var email = form.email.value.trim();
-      var message = form.message.value.trim();
-      var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
 
-      if (!name || !email || !message) {
-        status.textContent = 'Please fill in every field before sending.';
-        return;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || !email || !message) {
+      status.textContent = "Please fill in every field before sending.";
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      status.textContent = "Please enter a valid email address.";
+      return;
+    }
+
+    status.textContent = "Sending...";
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (response.ok) {
+        status.textContent =
+          "✅ Thanks, " +
+          name.split(" ")[0] +
+          "! Your message has been sent successfully.";
+
+        form.reset();
+      } else {
+        status.textContent =
+          "❌ Something went wrong. Please try again.";
       }
-      if (!emailPattern.test(email)) {
-        status.textContent = 'Please enter a valid email address.';
-        return;
-      }
-
-      status.textContent = 'Thanks, ' + name.split(' ')[0] + '! Your message has been noted — I\u2019ll reply by email soon.';
-      form.reset();
-    });
-  }
+    } catch (error) {
+      status.textContent =
+        "❌ Network error. Please try again later.";
+    }
+  });
+}
 
   /* ---------- Footer year ---------- */
   var yearEl = document.getElementById('year');
