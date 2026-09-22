@@ -1,47 +1,32 @@
-# Hilcar Idelio — Portfolio
+# Hilcar Mahema — Portfolio
 
-A premium, minimalist one-page portfolio for **Hilcar Idelio**, Web Developer & IT Support Technician based in Portugal. Built with plain HTML5, CSS3 and vanilla JavaScript — no frameworks, no build step.
+An editorial personal portfolio in Portuguese, built with HTML, CSS and vanilla JavaScript. No build step or framework.
 
-## Tech stack
+## Preview
 
-- HTML5 (semantic, accessible markup)
-- CSS3 with custom properties (design tokens) for theming
-- Vanilla JavaScript (ES5-compatible, no dependencies)
-- Google Fonts (Poppins)
+Serve this folder with any static HTTP server (for example `python3 -m http.server 8080`) and open `http://localhost:8080`.
 
-## File structure
+## Pages and assets
 
-```
-├── index.html      → Page markup (all sections)
-├── style.css       → Design tokens, layout, components, dark mode, responsive rules
-├── script.js       → Theme toggle, navbar scroll state, mobile nav, reveal animations, form
-├── assets/         → Placeholder project preview SVGs
-└── README.md
-```
+- `index.html`: introduction, selected projects, about, services, experience and contact.
+- `venix.html`: Venix project story, linked from both the project image and title.
+- `style.css`: responsive editorial layout, ivory/blue palette, dark theme and reduced-motion support.
+- `script.js`: persistent theme choice, accessible mobile navigation and contact submission.
+- `images/hilcar-portrait.jpg` and `images/hilcar-portrait-small.jpg`: optimized versions of the approved AI-edited portrait supplied for this redesign. Original source photos are not included.
+- Existing project images are brand artwork, not screenshots of the websites.
 
-## Features
+## Editing
 
-- **Sticky navbar** — transparent on load, glassmorphism blur once the page scrolls.
-- **Dark mode** — toggle in the navbar, respects the visitor's OS preference on first visit, choice persisted in `localStorage`.
-- **Sections** — Hero, About, Services, Featured Project (case study), Projects grid, Skills, Experience timeline, Contact, Footer.
-- **Motion** — fade-up reveals on scroll, hover lift on cards, button scale-down on press, smooth in-page scrolling. Everything is disabled automatically when the visitor has `prefers-reduced-motion: reduce` set.
-- **Accessibility** — semantic landmarks, skip-to-content link, visible focus states, labelled form fields, `aria-*` attributes on interactive controls, sufficient color contrast in both themes.
-- **Performance** — no external JS libraries, system-preferred font fallback stack, `loading="lazy"` on below-the-fold images, lightweight inline SVG illustrations instead of raster images.
+Text and project URLs live in the HTML. Palette tokens live at the top of `style.css`. The website defaults to the editorial light theme, and remembers an explicit theme choice. All sections remain visible without JavaScript; native navigation, project disclosures and the form action still work.
 
-## Running locally
+The Venix case study intentionally has no unverified public website URL. Add the confirmed URL when available. The Start Out project links to `https://startoutglobal.com/`. The personal GitHub profile link is preserved from the original portfolio; the source-code link points to this repository.
 
-No build step is required. Open `index.html` directly in a browser, or serve the folder with any static server, for example:
+## Contact
 
-```bash
-npx serve .
-```
+The form posts to the existing Formspree endpoint `https://formspree.io/f/xaqggzpv`. Native validation runs before submission; JavaScript handles pending, success, failure and timeout states, blocks duplicate submissions, and retains the message after a failure. The name is read through `form.elements.namedItem`, avoiding the built-in `form.name` property. Email and WhatsApp remain alternative contact paths.
 
-## Customizing
+Automated verification must intercept Formspree requests. Do not send test messages to the live inbox. Successful delivery by the third-party service needs a separate authorized live check.
 
-- **Colors & type** — all brand tokens live at the top of `style.css` under `:root` (light) and `html[data-theme="dark"]` (dark). Change `--color-primary`, `--color-accent`, etc. in one place to re-theme the whole site.
-- **Content** — copy for every section lives directly in `index.html`; project cards and images are in the `#projects` section and `assets/`.
-- **Contact form** — `script.js` currently validates and shows a confirmation message client-side only. Wire the `submit` handler up to your backend, form service (e.g. Formspree, Netlify Forms) or API endpoint to actually send messages.
+## Deployment
 
----
-
-© 2026 Hilcar Idelio — Built with HTML, CSS & JavaScript.
+Deploy the repository root as a static website; there is no build command. Relative asset paths support subdirectory hosting. Open Graph imagery uses the existing production portfolio domain and becomes available there once the change is deployed.
