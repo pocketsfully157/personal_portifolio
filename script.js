@@ -1,155 +1,86 @@
-/* =========================================================
-   Hilcar Idelio — Portfolio
-   Vanilla JS: theme toggle, navbar state, mobile nav,
-   scroll reveal, smooth anchor scroll, contact form
-   ========================================================= */
-(function () {
+(() => {
   'use strict';
-
-  var root = document.documentElement;
-  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- Theme (dark mode) ---------- */
-  var THEME_KEY = 'hilcar-theme';
-  var themeToggle = document.getElementById('theme-toggle');
-
-  function getPreferredTheme() {
-    var stored = null;
-    try { stored = localStorage.getItem(THEME_KEY); } catch (e) { /* storage unavailable */ }
-    if (stored === 'light' || stored === 'dark') return stored;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const root = document.documentElement;
+  root.classList.add('js');
+  const themeButton = document.getElementById('theme-toggle');
+  function syncTheme() {
+    const dark = root.dataset.theme === 'dark';
+    themeButton?.setAttribute('aria-pressed', String(dark));
+    themeButton?.setAttribute('aria-label', dark ? 'Ativar tema claro' : 'Ativar tema escuro');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#181a19' : '#f5f3ed');
   }
-
-  function applyTheme(theme) {
-    root.setAttribute('data-theme', theme);
-    if (themeToggle) {
-      themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-      themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-    }
+  syncTheme();
+  themeButton?.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('hilcar-theme', root.dataset.theme); } catch (_) { /* Theme still works without storage. */ }
+    syncTheme();
+  });
+  const nav = document.getElementById('primary-nav');
+  const navToggle = document.getElementById('nav-toggle');
+  function closeMenu() {
+    nav?.classList.remove('is-open');
+    navToggle?.setAttribute('aria-expanded', 'false');
+    navToggle?.setAttribute('aria-label', 'Abrir menu');
   }
-
-  applyTheme(getPreferredTheme());
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', function () {
-      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* storage unavailable */ }
-    });
-  }
-
-  /* ---------- Navbar scroll state (glassmorphism) ---------- */
-  var navbar = document.getElementById('navbar');
-  var lastScrollCheck = false;
-
-  function updateNavbarState() {
-    var scrolled = window.scrollY > 12;
-    if (scrolled !== lastScrollCheck) {
-      navbar.classList.toggle('is-scrolled', scrolled);
-      lastScrollCheck = scrolled;
-    }
-  }
-
-  if (navbar) {
-    updateNavbarState();
-    window.addEventListener('scroll', updateNavbarState, { passive: true });
-  }
-
-  /* ---------- Mobile nav toggle ---------- */
-  var navToggle = document.getElementById('nav-toggle');
-  var primaryNav = document.getElementById('primary-nav');
-
-  if (navToggle && primaryNav) {
-    navToggle.addEventListener('click', function () {
-      var isOpen = primaryNav.classList.toggle('is-open');
-      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-    });
-
-    primaryNav.querySelectorAll('.nav__link').forEach(function (link) {
-      link.addEventListener('click', function () {
-        primaryNav.classList.remove('is-open');
-        navToggle.setAttribute('aria-expanded', 'false');
-        navToggle.setAttribute('aria-label', 'Open menu');
-      });
-    });
-  }
-
-  /* ---------- Scroll reveal (fade-up) ---------- */
-  var revealEls = document.querySelectorAll('.reveal');
-
-  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
-    revealEls.forEach(function (el) { el.classList.add('is-visible'); });
-  } else {
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
-    );
-    revealEls.forEach(function (el) { observer.observe(el); });
-  }
-
-  /* ---------- Contact form (front-end only demo) ---------- */
-  const form = document.getElementById("contact-form");
-const status = document.getElementById("form-status");
-
-if (form && status) {
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!name || !email || !message) {
-      status.textContent = "Please fill in every field before sending.";
-      return;
-    }
-
-    if (!emailPattern.test(email)) {
-      status.textContent = "Please enter a valid email address.";
-      return;
-    }
-
-    status.textContent = "Sending...";
-
-    try {
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: new FormData(form),
-        headers: {
-          Accept: "application/json"
-        }
-      });
-
-      if (response.ok) {
-        status.textContent =
-          "✅ Thanks, " +
-          name.split(" ")[0] +
-          "! Your message has been sent successfully.";
-
-        form.reset();
-      } else {
-        status.textContent =
-          "❌ Something went wrong. Please try again.";
-      }
-    } catch (error) {
-      status.textContent =
-        "❌ Network error. Please try again later.";
+  navToggle?.addEventListener('click', () => {
+    const open = nav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+  });
+  nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && nav?.classList.contains('is-open')) {
+      closeMenu(); navToggle.focus();
     }
   });
-}
+  document.addEventListener('click', event => {
+    if (!nav?.contains(event.target) && !navToggle?.contains(event.target)) closeMenu();
+  });
+  matchMedia('(min-width: 701px)').addEventListener('change', closeMenu);
 
-  /* ---------- Footer year ---------- */
-  var yearEl = document.getElementById('year');
-  if (yearEl) { yearEl.textContent = new Date().getFullYear(); }
-
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('form-status');
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (form.dataset.sending === 'true' || !form.reportValidity()) return;
+    const name = form.elements.namedItem('name');
+    const message = form.elements.namedItem('message');
+    if (!name.value.trim() || !message.value.trim()) {
+      status.textContent = 'Preenche o teu nome e a mensagem antes de enviar.';
+      status.dataset.state = 'error';
+      (!name.value.trim() ? name : message).focus();
+      return;
+    }
+    const button = form.querySelector('button[type="submit"]');
+    const label = document.getElementById('submit-label');
+    form.dataset.sending = 'true';
+    form.setAttribute('aria-busy', 'true');
+    button.disabled = true;
+    label.textContent = 'A enviar…';
+    status.textContent = 'A enviar a tua mensagem…';
+    status.dataset.state = 'pending';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST', body: new FormData(form),
+        headers: { Accept: 'application/json' }, signal: controller.signal
+      });
+      if (!response.ok) throw new Error('Submission failed');
+      status.textContent = 'Obrigado! A tua mensagem foi enviada. Falamos em breve.';
+      status.dataset.state = 'success';
+      form.reset();
+    } catch (_) {
+      status.textContent = 'Não foi possível confirmar o envio. Tenta novamente ou contacta-me por email ou WhatsApp.';
+      status.dataset.state = 'error';
+    } finally {
+      clearTimeout(timeout);
+      form.dataset.sending = 'false';
+      form.removeAttribute('aria-busy');
+      button.disabled = false;
+      label.textContent = 'Enviar mensagem';
+    }
+  });
+  const year = document.getElementById('year');
+  if (year) year.textContent = new Date().getFullYear();
 })();
