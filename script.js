@@ -38,15 +38,6 @@
   });
   matchMedia('(min-width: 701px)').addEventListener('change', closeMenu);
 
-  const marquee = document.querySelector('.expertise-strip');
-  const marqueeToggle = document.querySelector('.marquee-toggle');
-  marqueeToggle?.addEventListener('click', () => {
-    const paused = marquee.classList.toggle('is-paused');
-    marqueeToggle.setAttribute('aria-pressed', String(paused));
-    marqueeToggle.querySelector('span').textContent = paused ? 'Retomar' : 'Pausar';
-    marqueeToggle.querySelector('path').setAttribute('d', paused ? 'M8 5l11 7-11 7Z' : 'M9 5v14M15 5v14');
-  });
-
   const form = document.getElementById('contact-form');
   const status = document.getElementById('form-status');
   form?.addEventListener('submit', async event => {
